@@ -136,6 +136,7 @@ class VersionManager:
                 continue
             table['version'] = latest
             table['version_date'] = now
+            self.toml[name] = table
             self._save()
 
 def get(name, **kwargs):
