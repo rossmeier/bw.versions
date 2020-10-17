@@ -46,7 +46,7 @@ class VersionManager:
         gh_api = Github()
         gh_repo = gh_api.get_repo(repo)
         latest = gh_repo.get_latest_release()
-        return latest.title
+        return latest.tag_name
 
     def _get_version_archlinux(self, name):
         url = 'https://www.archlinux.org/packages/search/json/?name={}'.format(name)
