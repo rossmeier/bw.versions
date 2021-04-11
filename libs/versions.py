@@ -58,6 +58,12 @@ class VersionManager:
     def _get_version_dummy(self, _):
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
+    def _get_version_gitea(self, url):
+        data = json.load(urllib.urlopen(url))
+        if len(data) < 1:
+            raise Exception("No releases found for gitea url {}".format(url))
+        return data[0]['tag_name']
+
     def _cached_version(self, name):
         if name not in self.toml:
             return None
@@ -145,6 +151,7 @@ def get(name, **kwargs):
     how the version should be retrieved. Currently supported:
       - `github="<user>/<repo>"`: Get the latest github release
       - `archlinux="<package>"`: Get the current version packaged for archlinux
+      - `gitea="https://api/v1/repos/user/name/releases"`: Get the latest gitea release
       - `dummy=""`: A pseudoversion derived from the current date and time
     '''
     VersionManager().add(name, **kwargs)
