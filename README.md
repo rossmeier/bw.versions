@@ -21,7 +21,7 @@ version = repo.libs.versions.get("gitea", github="go-gitea/gitea").lstrip("v")
 actions = {
     'download': {
         'unless': 'test -f /root/gitea-{}-linux-amd64').format(version),
-        'command': 'curl -o /root/gitea-{version}-linux-amd64 '
+        'command': 'curl -fsSL -o /root/gitea-{version}-linux-amd64 '
             'https://dl.gitea.io/gitea/{version}/gitea-{version}-linux-amd64;'
             'chmod 755 /root/gitea-{version}-linux-amd64').format(
                 version=version,
