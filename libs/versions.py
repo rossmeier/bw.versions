@@ -111,16 +111,9 @@ class VersionManager:
         """Get the currently cached version"""
         return self._cached_version(name)
 
-    def update_interactive(self):
+    def update_all(self, interactive=False):
         """Update all versions, prompting the user for each possible update"""
-        question = wrap_question(
-            bold("Version management"),
-            "Do you want to check configured software versions for updates",
-            "Check for updates ?",
-            prefix="{} versions".format(blue("?")),
-        )
-        if not io.ask(question, True):
-            return
+        io.activate()
         for name, table in self.toml.items():
             latest = self._latest_version(name)
             current = self._cached_version(name)
@@ -132,14 +125,22 @@ class VersionManager:
                     current=current,
                 ))
                 continue
-            question = wrap_question(
-                name,
-                "{} → {}".format(red(current), green(latest)),
-                "Update {}".format(bold(name)),
-                prefix="{} versions".format(blue("?"))
-            )
-            if not io.ask(question, True):
-                continue
+            if interactive:
+                question = wrap_question(
+                    name,
+                    "{} → {}".format(red(current), green(latest)),
+                    "Update {}".format(bold(name)),
+                    prefix="{} versions".format(blue("?"))
+                )
+                if not io.ask(question, True):
+                    continue
+            else:
+                io.stdout("{x} updated {name}: {current} → {new}".format(
+                    x=green("✓"),
+                    name=bold(name),
+                    current=red(current),
+                    new=green(latest),
+                ))
             table['version'] = latest
             table['version_date'] = now
             self.toml[name] = table

@@ -56,6 +56,8 @@ Thanks to the integrated `apply_start()` hook, the user will automatically be as
 ? versions ╰─ Update bla [Y/n] n
 ```
 
+To manually update all dependencies use `bw debug -c 'repo.libs.versions.VersionManager().update_all()'`
+
 ### Version cache
 The current version for each software will be stored to `versions.toml` inside your repo. Depending on your workflow,
 you can either add this to your `.gitignore` or commit it to your repo.
