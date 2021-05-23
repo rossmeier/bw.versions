@@ -7,6 +7,7 @@ import json
 import pathlib
 import urllib.request as urllib
 
+import feedparser
 import tomlkit
 
 from github import Github
@@ -63,6 +64,10 @@ class VersionManager:
         if len(data) < 1:
             raise Exception("No releases found for gitea url {}".format(url))
         return data[0]['tag_name']
+
+    def _get_version_rss(self, url):
+        feed = feedparser.parse(url)
+        return feed.entries[0].title
 
     def _cached_version(self, name):
         if name not in self.toml:
