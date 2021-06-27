@@ -8,6 +8,7 @@ import pathlib
 import urllib.request as urllib
 
 import feedparser
+import github
 import tomlkit
 
 from github import Github
@@ -46,7 +47,12 @@ class VersionManager:
     def _get_version_github(self, repo):
         gh_api = Github()
         gh_repo = gh_api.get_repo(repo)
-        latest = gh_repo.get_latest_release()
+        try:
+            latest = gh_repo.get_latest_release()
+        except github.GithubException:
+            # fall back to tags
+            latest = list(gh_repo.get_tags())[0]
+            return latest.name
         return latest.tag_name
 
     def _get_version_archlinux(self, name):
