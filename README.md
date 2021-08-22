@@ -35,6 +35,8 @@ You can specify where the version should be retrieved from by using args to `ver
  - `github="<user>/<repo>"`: Get the latest github release
  - `archlinux="<package>"`: Get the current version packaged for archlinux
  - `dummy=""`: A pseudoversion derived from the current date and time
+ - `gitea="<api url>"`: Get the latest release of a gitea repo. `api url` is the url of the gitea releases API endpoint of the desired repo eg. `https://gitea.com/api/v1/repos/gitea/website/releases`
+ - `rss="<url>"`: Use the title of the latest/first item of the given RSS feed url as the version
 
 ### Updating versions
 Thanks to the integrated `apply_start()` hook, the user will automatically be asked to update versions for each run of
