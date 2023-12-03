@@ -1,7 +1,7 @@
-'''
+"""
 Library to manage software versions. Versions are stored in version.toml inside the current repo.
 To update versions interactively, use VersionManager().update_interactive().
-'''
+"""
 import datetime
 import json
 import pathlib
@@ -18,8 +18,10 @@ from bundlewrap.utils import get_file_contents, ErrorContext
 from bundlewrap.utils.text import wrap_question, bold, red, green, blue
 from bundlewrap.utils.ui import io
 
+
 class VersionManager:
-    '''Manages all software versions'''
+    """Manages all software versions"""
+
     @classmethod
     def _get_versionfile_path(cls):
         path = pathlib.Path(__file__).parent.parent.absolute()
@@ -42,7 +44,7 @@ class VersionManager:
             self.toml = tomlkit.toml_document.TOMLDocument()
 
     def _save(self):
-        with open(self._get_versionfile_path(), 'w') as file:
+        with open(self._get_versionfile_path(), "w") as file:
             file.write(tomlkit.dumps(self.toml))
 
     def _get_version_github(self, repo):
@@ -57,11 +59,11 @@ class VersionManager:
         return latest.tag_name
 
     def _get_version_archlinux(self, name):
-        url = 'https://www.archlinux.org/packages/search/json/?name={}'.format(name)
+        url = "https://www.archlinux.org/packages/search/json/?name={}".format(name)
         data = json.load(urllib.urlopen(url))
-        if len(data['results']) != 1:
+        if len(data["results"]) != 1:
             raise Exception("No exact match found for arch package {}".format(name))
-        return data['results'][0]['pkgver']
+        return data["results"][0]["pkgver"]
 
     def _get_version_dummy(self, _):
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -76,7 +78,7 @@ class VersionManager:
         data = json.load(urllib.urlopen(url))
         if len(data) < 1:
             raise Exception("No releases found for gitea url {}".format(url))
-        return data[0]['tag_name']
+        return data[0]["tag_name"]
 
     def _get_version_rss(self, url):
         feed = feedparser.parse(url)
@@ -85,9 +87,9 @@ class VersionManager:
     def _cached_version(self, name):
         if name not in self.toml:
             return None
-        if 'version' not in self.toml[name]:
+        if "version" not in self.toml[name]:
             return None
-        return self.toml[name]['version']
+        return self.toml[name]["version"]
 
     def _latest_version(self, name):
         if name not in self.toml:
@@ -121,8 +123,8 @@ class VersionManager:
     def update(self, name):
         """Update the given version"""
         table = self.toml[name]
-        table['version'] = self._latest_version(name)
-        table['version_date'] = datetime.datetime.now()
+        table["version"] = self._latest_version(name)
+        table["version_date"] = datetime.datetime.now()
         self._save()
 
     def get(self, name):
@@ -137,41 +139,46 @@ class VersionManager:
             current = self._cached_version(name)
             now = datetime.datetime.now()
             if latest == current:
-                io.stdout("{x} {name} is up to date ({current})".format(
-                    x=green("✓"),
-                    name=name,
-                    current=current,
-                ))
+                io.stdout(
+                    "{x} {name} is up to date ({current})".format(
+                        x=green("✓"),
+                        name=name,
+                        current=current,
+                    )
+                )
                 continue
             if interactive:
                 question = wrap_question(
                     name,
                     "{} → {}".format(red(current), green(latest)),
                     "Update {}".format(bold(name)),
-                    prefix="{} versions".format(blue("?"))
+                    prefix="{} versions".format(blue("?")),
                 )
                 if not io.ask(question, True):
                     continue
             else:
-                io.stdout("{x} updated {name}: {current} → {new}".format(
-                    x=green("✓"),
-                    name=bold(name),
-                    current=red(current),
-                    new=green(latest),
-                ))
-            table['version'] = latest
-            table['version_date'] = now
+                io.stdout(
+                    "{x} updated {name}: {current} → {new}".format(
+                        x=green("✓"),
+                        name=bold(name),
+                        current=red(current),
+                        new=green(latest),
+                    )
+                )
+            table["version"] = latest
+            table["version_date"] = now
             self.toml[name] = table
             self._save()
 
+
 def get(name, **kwargs):
-    '''
+    """
     Get the current version number for the given software packet. Use additional args to specify
     how the version should be retrieved. Currently supported:
       - `github="<user>/<repo>"`: Get the latest github release
       - `archlinux="<package>"`: Get the current version packaged for archlinux
       - `gitea="https://api/v1/repos/user/name/releases"`: Get the latest gitea release
       - `dummy=""`: A pseudoversion derived from the current date and time
-    '''
+    """
     VersionManager().add(name, **kwargs)
     return VersionManager().get(name)
