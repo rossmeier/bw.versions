@@ -6,6 +6,7 @@ import datetime
 import json
 import pathlib
 import urllib.request as urllib
+import re
 
 import feedparser
 import github
@@ -66,6 +67,12 @@ class VersionManager:
         return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     def _get_version_gitea(self, url):
+        if "/api/v1/repos/" not in url:
+            url = re.sub(
+                r"^(https?://[a-zA-Z0-9\-_]+\.[a-zA-Z]+)\/(.+?)\/?$",
+                r"\1/api/v1/repos/\2/releases",
+                url,
+            )
         data = json.load(urllib.urlopen(url))
         if len(data) < 1:
             raise Exception("No releases found for gitea url {}".format(url))
