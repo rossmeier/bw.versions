@@ -41,7 +41,7 @@ class VersionManager:
         try:
             self.toml = tomlkit.parse(get_file_contents(self._get_versionfile_path()))
         except ErrorContext:
-            self.toml = tomlkit.toml_document.TOMLDocument()
+            self.toml = tomlkit.TOMLDocument()
 
     def _save(self):
         with open(self._get_versionfile_path(), "w") as file:
